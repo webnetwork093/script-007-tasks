@@ -1,4 +1,4 @@
 
-# <project name> project
+# File Server project
 
-Author is <author name>.
+Author is Kryukov Mikhail
