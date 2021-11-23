@@ -1,4 +1,5 @@
 
-# PROJECT_NAME project
+# File Server project
 
-Author is AUTHOR_NAME.
+Author is Kryukov Mikhail
+
