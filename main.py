@@ -11,12 +11,12 @@ def main():
     Get and parse command line parameters and configure web app.
 
     Command line options:
-    -f --folder - working directory (absolute or relative path, default: current app folder).
+    -d --dir  - working directory (absolute or relative path, default: current_app_folder/data).
     -h --help - help.
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument('-f', '--folder', default=os.path.join(os.getcwd(), 'data'), type=str,
-                        help="working directory (default: 'data' folder)")
+    parser.add_argument('-d', '--dir', default=os.path.join(os.getcwd(), 'data'), type=str,
+                        help="working directory (default: 'data')")
 
     params = parser.parse_args()
     FileService.change_dir(params.folder)

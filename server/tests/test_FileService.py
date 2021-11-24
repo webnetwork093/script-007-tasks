@@ -36,7 +36,7 @@ def safe_cleanup():
     cleanup()  # after all tests
 
 
-class Test_change_dir:
+class TestChangeDir:
 
     def test_incorrect_type1(self):
         """Передать None в качестве значения
