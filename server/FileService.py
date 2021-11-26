@@ -1,5 +1,10 @@
 import os
 import re
+import logging
+
+#print(os.path.join(os.getcwd(),"server.log"))
+#logging.info('{} + {} = {}'.format(1,3,4))
+
 
 def check_file_name(filename: str) -> int:
     """Checks filename is valid (for Windows)
@@ -10,7 +15,9 @@ def check_file_name(filename: str) -> int:
     Returns: count of invalid symbols in filename
 
     """
-    return len(re.findall("[\\\/\*:\?|<>]", filename))
+    if len(re.findall("[\\\/\*:\?|<>]", filename)) > 0:
+        return True
+    return False
 
 
 def change_dir(path: str, autocreate: bool = True) -> None:
@@ -29,14 +36,17 @@ def change_dir(path: str, autocreate: bool = True) -> None:
         if autocreate:
             os.makedirs(path, mode=0o777, exist_ok=False)
         else:
+            logging.error("Directory does not exist")
             raise RuntimeError("Directory does not exist")
-    elif check_file_name(os.path.basename(path)) > 0:
+    elif check_file_name(os.path.basename(path)):
+        logging.error("Directory name is invalid")
         raise ValueError("Directory name is invalid")
     elif not os.path.isdir(path):
+        logging.error("Path is not directory")
         raise ValueError("Path is not directory")
 
     os.chdir(path)
-
+    logging.info("Directory changed to " + path)
 
 def get_files() -> list:
     """Get info about all files in working directory.
@@ -55,6 +65,7 @@ def get_files() -> list:
     for file in os.listdir(curr_dir):
         #file = os.path.join(curr_dir, file)
         if os.path.isfile(file):
+            logging.info("File found: " + file)
             files.append(get_file_data(file))
 
     return files
@@ -78,10 +89,12 @@ def get_file_data(filename: str, get_content: bool = True) -> dict:
         RuntimeError: if file does not exist.
         ValueError: if filename is invalid.
     """
-    if check_file_name(os.path.basename(filename)) > 0:
+    if check_file_name(os.path.basename(filename)):
+        logging.error("Filename is invalid")
         raise ValueError("Filename is invalid")
 
     if not os.path.exists(filename):
+        logging.error("File does not exist")
         raise RuntimeError("File does not exist")
 
     if get_content:
@@ -112,7 +125,8 @@ def create_file(filename: str, content: str = "") -> dict:
     Raises:
         ValueError: if filename is invalid.
     """
-    if check_file_name(os.path.basename(filename)) > 0:
+    if check_file_name(os.path.basename(filename)):
+        logging.error("Filename is invalid")
         raise ValueError("Filename is invalid")
 
     with open(filename, "wb") as file:
@@ -121,7 +135,7 @@ def create_file(filename: str, content: str = "") -> dict:
     return get_file_data(filename)
 
 
-def delete_file(filename: str) -> bool:
+def delete_file(filename: str) -> None:
     """Delete file.
 
     Args:
@@ -132,10 +146,12 @@ def delete_file(filename: str) -> bool:
         ValueError: if filename is invalid.
     """
 
-    if check_file_name(os.path.basename(filename)) > 0:
+    if check_file_name(os.path.basename(filename)):
+        logging.error("Filename is invalid")
         raise ValueError("Filename is invalid")
 
     if not os.path.exists(filename):
+        logging.error("File does not exist")
         raise RuntimeError("File does not exist")
 
     try:
@@ -143,6 +159,6 @@ def delete_file(filename: str) -> bool:
             os.remove(filename)
         else:
             os.removedirs(filename)
-        return True
-    except RuntimeError:
-        print("Can't delete file/path")
+    except:
+        logging.error("Can't delete file/path")
+        raise RuntimeError("Can't delete file/path")
