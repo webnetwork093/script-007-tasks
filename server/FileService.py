@@ -1,7 +1,7 @@
+import logging
 import os
 import re
 import shutil
-import sys
 
 import utils.TimeUtils as TimeUtils
 
@@ -32,6 +32,7 @@ def change_dir(path: str, autocreate: bool = True) -> None:
         else:
             raise RuntimeError('Directory {} is not found'.format(path))
     os.chdir(path)
+    logging.debug('change working directory to %s', path)
 
 
 def get_files() -> list:
@@ -149,7 +150,7 @@ def create_file(filename: str, content: str = None) -> dict:
     local_file = _filename_to_local_path(filename)
 
     if os.path.exists(local_file):
-        print('file %s exists', local_file, file=sys.stderr)
+        logging.warn('file %s exists', local_file)
 
     with open(local_file, 'wb') as file_handler:
         if content:

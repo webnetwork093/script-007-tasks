@@ -16,3 +16,7 @@ venv*/
 
 # default data folder
 /data/
+
+# app logs
+*.log
+*.log.*
