@@ -13,6 +13,7 @@ Author is Maxim Suslov.
 [x] Specify directory to keep manage files via CLI arguments
 [x] Cover functionality using `pytest`
 [ ] Deploy via Docker image (for those who is familiar with Docker)
+[ ] Use `logging` module for logging
 
 ## File Service
 
