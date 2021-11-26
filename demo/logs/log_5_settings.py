@@ -5,10 +5,10 @@ dictConfig({
     'version': 1,
     'formatters': {
         'default': {
-            'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+            'format': '%(asctime)s %(name)s - %(levelname)s : %(message)s',
         },
         'to_file': {
-            'format': '!!! [%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+            'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
         },
     },
     'handlers': {
