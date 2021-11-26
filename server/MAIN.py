@@ -2,8 +2,8 @@ import argparse
 import os
 import server.FileService as FileService
 import logging
-
-format = '%(asctime)s %(funcName)s - %(levelname)s %(message)s'
+import sys
+import traceback
 
 def main():
     """Entry point
@@ -12,19 +12,26 @@ def main():
     -d --dir -  Working directory, (default: 'data')
 
     """
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--dir', default=os.path.join(os.getcwd(), 'data'), type=str, help="Working directory, (default: 'data')")
-    parser.add_argument('-l', '--loglevel', default=logging.getLevelName("ERROR"), type=str, help="Logging level, (default: 'ERROR')")
 
-    params = parser.parse_args()
+    try:
 
-    logging.basicConfig(filename=os.path.join(os.getcwd(), "server.log"), level=logging.getLevelName(params.loglevel), format=format)
+        parser = argparse.ArgumentParser()
+        parser.add_argument('-d', '--dir', default=os.path.join(os.getcwd(), 'data'), type=str, help="Working directory, (default: 'data')")
+        parser.add_argument('-l', '--loglevel', default="ERROR", choices=["DEBUG","INFO","WARNING","ERROR"], type=str, help="Logging level, (default: 'ERROR')")
 
-    logging.debug("debug")
-    logging.error("error")
-    logging.info("info")
+        params = parser.parse_args()
 
-    FileService.change_dir(params.dir)
+        logging.basicConfig(filename=os.path.join(os.getcwd(), "server.log"),
+                            level=logging.getLevelName(params.loglevel),
+                            format='%(asctime)s %(funcName)s - %(levelname)s %(message)s')
+
+        FileService.change_dir(params.dir)
+
+    except (RuntimeError, ValueError) as err:
+        logging.error(err)
+        traceback.print_exc(file=sys.stdout)
+        sys.exit(1)
+
 
 if __name__ == "__main__":
     main()
