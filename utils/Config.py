@@ -7,7 +7,6 @@ from utils.SingletonMeta import singleton
 import dotted_dict
 
 
-@singleton
 class LayeredConfig:
     _logger = None
     _env_prefix = 'SERVER'
@@ -95,8 +94,13 @@ class LayeredConfig:
         # print to sys.file.stdout or specified file
         pass
 
-    # def __setitem__(self, key, value):
-    #     self.data.__setitem__(key, value)
-    #
-    # def __getitem__(self, key):
-    #     return self.data.__getitem__(key)
+
+@singleton
+class SingletonConfig:
+
+    def __init__(self):
+        self.layered_config = LayeredConfig()
+        self.layered_config.update()
+
+
+config = SingletonConfig().layered_config.data

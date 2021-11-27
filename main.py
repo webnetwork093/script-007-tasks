@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
-import argparse
 import logging
 import logging.config
-import os
 import sys
 
 import server.FileService as FileService
-import server.Config as Config
+from utils.Config import config
 
 
 def setup_logger(level='NOTSET', filename=None):
-    config = {
+    logger_conf = {
         'version': 1,
         'formatters': {
             'default': {
@@ -30,23 +28,21 @@ def setup_logger(level='NOTSET', filename=None):
         }
     }
     if filename:
-        config['handlers']['file'] = {
+        logger_conf['handlers']['file'] = {
             'class': 'logging.FileHandler',
             'encoding': 'UTF-8',
             'formatter': 'default',
             'filename': filename,
         }
-        config['root']['handlers'].append('file')
-    logging.config.dictConfig(config)
+        logger_conf['root']['handlers'].append('file')
+    logging.config.dictConfig(logger_conf)
 
 
 def main():
-    config = Config.LayeredConfig()
-    config.update()
-    setup_logger(level=logging.getLevelName(config.data.log.level.upper()), filename=config.data.log.file)
+    setup_logger(level=logging.getLevelName(config.log.level.upper()), filename=config.log.file)
     logging.debug('started')
 
-    FileService.change_dir(config.data.dir)
+    FileService.change_dir(config.dir)
 
 
 if __name__ == '__main__':
