@@ -32,7 +32,7 @@ def change_dir(path: str, autocreate: bool = True) -> None:
         else:
             raise RuntimeError('Directory {} is not found'.format(path))
     os.chdir(path)
-    logging.debug('change working directory to %s', path)
+    logging.debug("change working directory to '%s'", path)
 
 
 def get_files() -> list:
