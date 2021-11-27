@@ -3,6 +3,7 @@ import argparse
 import logging
 import logging.config
 import os
+import sys
 
 import server.FileService as FileService
 
@@ -62,4 +63,10 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        sys.exit('\nERROR: Interrupted by user')
+    except BaseException as err:
+        print(f'ERROR: Something goes wrong:\n{err}')
+        sys.exit(1)
