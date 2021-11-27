@@ -41,6 +41,7 @@ def setup_logger(level='NOTSET', filename=None):
 def main():
     setup_logger(level=logging.getLevelName(config.log.level.upper()), filename=config.log.file)
     logging.debug('started')
+    logging.debug('config %s', config.to_dict())
 
     FileService.change_dir(config.dir)
 

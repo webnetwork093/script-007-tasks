@@ -8,19 +8,36 @@ import dotted_dict
 
 
 class LayeredConfig:
+    """
+    Configuration storage that reads data from (from high to low priority):
+    - command line
+    - environment variables
+    - configuration file
+    If a value for specific key not found then default value is used.
+
+    You can use dot notation to access specific values.
+
+    There are the following values:
+    config    - name of configuration file
+    dir       - directory to keep files
+    log.level - logging level
+    log.file  - log filename
+    """
+
     _logger = None
     _env_prefix = 'SERVER'
     data = None
     _arg_parser = None
     _args = None
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._logger = logging.getLogger('config')
         self.data = dotted_dict.DottedDict()
         self._set_defaults()
         self._create_parser()
 
-    def _set_defaults(self):
+    def _set_defaults(self) -> None:
+        """Set default values."""
         self.data.update({
             'config': 'config.ini',
             'dir': 'data',
@@ -30,8 +47,29 @@ class LayeredConfig:
             }
         })
 
-    def _create_parser(self):
-        """Get and parse command line parameters and configure web app.
+    def _read_config(self) -> None:
+        """Read values from configuration file."""
+        if not os.path.exists(self.data.config):
+            self._logger.info(f"config file '{self.data.config}' not found")
+            return
+        with open(self.data.config) as stream:
+            ini_parser = configparser.ConfigParser()
+            ini_parser.read_string('[default]\n' + stream.read())
+            ini_params = ini_parser['default']
+            self.data.dir = ini_params.get('dir', self.data.dir)
+            self.data.log.level = ini_params.get('log.level', self.data.log.level)
+            self.data.log.file = ini_params.get('log.file', self.data.log.file)
+
+    def _read_envvars(self) -> None:
+        """Read values from environment variables."""
+        prefix = self._env_prefix.upper()
+        self.data.config = os.getenv(f'{prefix}_CONFIG', self.data.config)
+        self.data.dir = os.getenv(f'{prefix}_DIR', self.data.dir)
+        self.data.log.level = os.getenv(f'{prefix}_LOG_LEVEL', self.data.log.level)
+        self.data.log.file = os.getenv(f'{prefix}_LOG_FILE', self.data.log.file)
+
+    def _create_parser(self) -> None:
+        """Create command line parser.
 
         Command line options:
         -d --dir       - working directory (absolute or relative path).
@@ -47,29 +85,11 @@ class LayeredConfig:
                                       help=f'Log level to console (default: {self.data.log.level})')
         self._arg_parser.add_argument('-l', '--log-file', type=str, help='Log file.')
 
-    def _read_envvars(self):
-        prefix = self._env_prefix.upper()
-        self.data.config = os.getenv(f'{prefix}_CONFIG', self.data.config)
-        self.data.dir = os.getenv(f'{prefix}_DIR', self.data.dir)
-        self.data.log.level = os.getenv(f'{prefix}_LOG_LEVEL', self.data.log.level)
-        self.data.log.file = os.getenv(f'{prefix}_LOG_FILE', self.data.log.file)
-
-    def _parse_arguments(self):
+    def _parse_arguments(self) -> None:
+        """Helper method for argument parsing."""
         self._args = self._arg_parser.parse_args()
 
-    def _read_config(self):
-        if not os.path.exists(self.data.config):
-            self._logger.info(f"config file '{self.data.config}' not found")
-            return
-        with open(self.data.config) as stream:
-            ini_parser = configparser.ConfigParser()
-            ini_parser.read_string('[default]\n' + stream.read())
-            ini_params = ini_parser['default']
-            self.data.dir = ini_params.get('dir', self.data.dir)
-            self.data.log.level = ini_params.get('log.level', self.data.log.level)
-            self.data.log.file = ini_params.get('log.file', self.data.log.file)
-
-    def _read_arguments(self):
+    def _read_arguments(self) -> None:
         if self._args.dir:
             self.data.dir = self._args.dir
         if self._args.log_level:
@@ -77,15 +97,24 @@ class LayeredConfig:
         if self._args.log_file:
             self.data.log.file = self._args.log_file
 
-    def _validate(self):
+    def _validate(self) -> None:
         pass
 
-    def update(self):
+    def update(self) -> None:
+        """Read values from different sources.
+
+        CLI arguments may redefine config filename, thus we need to split the whole process of config file processing
+        to separate steps:
+
+        - _create_parser (done once)
+        - _parse_arguments (find custom config filename if any)
+        - _read_arguments (read values from CLI arguments)
+        """
         self._set_defaults()
         self._read_envvars()
         self._parse_arguments()
         if self._args.config:
-            self.data['config'] = self._args.config
+            self.data.config = self._args.config
         self._read_config()
         self._read_arguments()
         self._validate()
@@ -98,7 +127,7 @@ class LayeredConfig:
 @singleton
 class SingletonConfig:
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.layered_config = LayeredConfig()
         self.layered_config.update()
 
