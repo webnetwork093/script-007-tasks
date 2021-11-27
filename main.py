@@ -6,6 +6,7 @@ import os
 import sys
 
 import server.FileService as FileService
+import server.Config as Config
 
 
 def setup_logger(level='NOTSET', filename=None):
@@ -40,26 +41,12 @@ def setup_logger(level='NOTSET', filename=None):
 
 
 def main():
-    """Entry point of app.
-
-    Get and parse command line parameters and configure web app.
-
-    Command line options:
-    -d --dir  - working directory (absolute or relative path, default: current_app_folder/data).
-    -h --help - help.
-    """
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--dir', default='data', type=str,
-                        help="working directory (default: 'data')")
-    parser.add_argument('--log-level', default='warning', choices=['debug', 'info', 'warning', 'error'],
-                        help='Log level to console (default is warning)')
-    parser.add_argument('-l', '--log-file', type=str, help='Log file.')
-    params = parser.parse_args()
-    setup_logger(level=logging.getLevelName(params.log_level.upper()), filename=params.log_file)
+    config = Config
+    x = config.log.level.upper()
+    setup_logger(level=logging.getLevelName(Config.log.level.upper()), filename=Config.log.file)
     logging.debug('started')
 
-    work_dir = params.dir if os.path.isabs(params.dir) else os.path.join(os.getcwd(), params.dir)
-    FileService.change_dir(work_dir)
+    FileService.change_dir(Config.dir)
 
 
 if __name__ == '__main__':
