@@ -10,7 +10,6 @@ Author is Maxim Suslov.
 [x] Support Python 3.7+
 [x] Use venv during the development
 [ ] Program must work both on Linux and Windows
-[x] Specify directory to keep manage files via CLI arguments
 [x] Cover functionality using `pytest`
 [ ] Deploy via Docker image (for those who is familiar with Docker)
 [x] Use `logging` module for logging
@@ -19,6 +18,12 @@ Author is Maxim Suslov.
 
 [x] Avoid usage of dangerous values like `../../../etc/passwd`
 [ ] Support binary file content as well
+
+## Configuration
+
+[x] Read settings from CLI arguments  
+[x] Read settings from env vars  
+[x] Read settings from config file  
 
 ## Web Service
 
