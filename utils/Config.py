@@ -3,7 +3,7 @@ import logging
 import os
 import configparser
 
-from utils.SingletonMeta import singleton
+from utils.Singleton import singleton
 import dotted_dict
 
 
