@@ -41,12 +41,12 @@ def setup_logger(level='NOTSET', filename=None):
 
 
 def main():
-    config = Config
-    x = config.log.level.upper()
-    setup_logger(level=logging.getLevelName(Config.log.level.upper()), filename=Config.log.file)
+    config = Config.LayeredConfig()
+    config.update()
+    setup_logger(level=logging.getLevelName(config.data.log.level.upper()), filename=config.data.log.file)
     logging.debug('started')
 
-    FileService.change_dir(Config.dir)
+    FileService.change_dir(config.data.dir)
 
 
 if __name__ == '__main__':
