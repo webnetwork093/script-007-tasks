@@ -1,6 +1,7 @@
 # python
 *.pyc
 __pycache__/
+.pytest_cache/
 
 # virtual environment
 .venv*/
@@ -13,4 +14,9 @@ venv*/
 /.vscode/
 *.code-workspace
 
+# default data folder
+/data/
+
+# app logs
 *.log
+*.log.*
