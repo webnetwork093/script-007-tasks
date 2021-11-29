@@ -5,16 +5,8 @@ import logging
 import sys
 import traceback
 import configparser
+from Singleton import singleton
 
-def singleton(cls):
-    instances = {}
-
-    def getinstance(*args, **kwargs):
-        if cls not in instances:
-            instances[cls] = cls(*args, **kwargs)
-        return instances[cls]
-
-    return getinstance
 
 @singleton
 class Config:
@@ -26,16 +18,19 @@ class Config:
 
     def read_config(self) -> None:
         self.config = configparser.ConfigParser()
-        self.config.read(os.path.join(os.getcwd(), 'config.ini'))
-        self.config = dict(self.config['DEFAULT'])
+
+        with open(os.path.join(os.getcwd(), 'config.ini')) as stream:
+            self.config.read_string('[default]\n' + stream.read())
+
+        self.config = dict(self.config['default'])
         return None
 
     def process_arguments(self) -> None:
         parser = argparse.ArgumentParser()
         parser.add_argument('-d', '--dir', default=os.path.join(os.getcwd(), 'data'), type=str,
                             help="Working directory, (default: 'data')")
-        parser.add_argument('-l', '--loglevel', default="ERROR", choices=["DEBUG", "INFO", "WARNING", "ERROR"], type=str,
-                            help="Logging level, (default: 'ERROR')")
+        parser.add_argument('-l', '--loglevel', default="error", choices=["debug", "info", "warning", "error"], type=str,
+                            help="Logging level, (default: 'error')")
 
         self.config["args"] = parser.parse_args()
 
@@ -55,11 +50,8 @@ def main():
 
         config = Config().config
 
-        logging.debug(config)
-        print(config.get("args").loglevel)
-
         logging.basicConfig(filename=os.path.join(os.getcwd(), config.get("log_file", "server.log")),
-                            level=logging.getLevelName(config.get("args").loglevel),
+                            level=logging.getLevelName(config.get("args").loglevel.upper()),
                             format='%(asctime)s %(funcName)s - %(levelname)s %(message)s')
 
         FileService.change_dir(config.get("args").dir)
