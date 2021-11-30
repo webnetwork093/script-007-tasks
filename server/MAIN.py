@@ -29,7 +29,7 @@ class Config:
         parser = argparse.ArgumentParser()
         parser.add_argument('-d', '--dir', default=os.path.join(os.getcwd(), 'data'), type=str,
                             help="Working directory, (default: 'data')")
-        parser.add_argument('-l', '--loglevel', default=self.config.get("log_level","").lower(), choices=["debug", "info", "warning", "error"], type=str,
+        parser.add_argument('-l', '--loglevel', default=self.config.get("log_level","error").lower(), choices=["debug", "info", "warning", "error"], type=str,
                             help="Logging level, (default: 'error')")
 
         self.config["args"] = parser.parse_args()
