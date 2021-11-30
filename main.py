@@ -3,7 +3,9 @@ import logging
 import logging.config
 import sys
 
-import server.FileService as FileService
+from aiohttp import web
+
+from server.WebHandler import WebHandler
 from utils.Config import config
 
 
@@ -43,7 +45,13 @@ def main():
     logging.debug('started')
     logging.debug('config %s', config.to_dict())
 
-    FileService.change_dir(config.dir)
+    handler = WebHandler()
+    app = web.Application()
+    app.add_routes([
+        web.get('/', handler.handle),
+        # TODO: add more routes
+    ])
+    web.run_app(app, port=config.port)
 
 
 if __name__ == '__main__':
