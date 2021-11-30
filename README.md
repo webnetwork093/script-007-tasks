@@ -22,8 +22,13 @@ Author is Kryukov Mikhail
 ## Configuration
 
 [x] Read settings from CLI arguments  
+<<<<<<< HEAD
 [ ] Read settings from env vars  
 [ ] Read settings from config file  
+=======
+[x] Read settings from env vars  
+[x] Read settings from config file  
+>>>>>>> trainer/05_REST_API
 
 ## Web Service
 

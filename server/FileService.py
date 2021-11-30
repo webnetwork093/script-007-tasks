@@ -1,6 +1,7 @@
 import os
 import re
 import logging
+from datetime import datetime
 
 #print(os.path.join(os.getcwd(),"server.log"))
 #logging.info('{} + {} = {}'.format(1,3,4))
@@ -34,13 +35,10 @@ def change_dir(path: str, autocreate: bool = True) -> None:
         if autocreate:
             os.makedirs(path, mode=0o777, exist_ok=False)
         else:
-            #logging.error("Directory does not exist")
             raise RuntimeError("Directory does not exist")
     elif check_file_name(os.path.basename(path)):
-        #logging.error("Directory name is invalid")
         raise ValueError("Directory name is invalid")
     elif not os.path.isdir(path):
-        #logging.error("Path is not directory")
         raise ValueError("Path is not directory")
 
     os.chdir(path)
@@ -61,7 +59,6 @@ def get_files() -> list:
     files = []
 
     for file in os.listdir(curr_dir):
-        #file = os.path.join(curr_dir, file)
         if os.path.isfile(file):
             logging.debug("File found: " + file)
             files.append(get_file_data(file))
@@ -88,22 +85,22 @@ def get_file_data(filename: str, get_content: bool = True) -> dict:
         ValueError: if filename is invalid.
     """
     if check_file_name(os.path.basename(filename)):
-        #logging.error("Filename is invalid")
         raise ValueError("Filename is invalid")
 
     if not os.path.exists(filename):
-        #logging.error("File does not exist")
         raise RuntimeError("File does not exist")
 
     if get_content:
         with open(filename, "r") as file:
             content = file.read()
+    else:
+        content = ""
 
     return {"name": os.path.basename(filename),
             "content": content,
-            "create_date": os.path.getctime(filename),
-            "edit_date": os.path.getmtime(filename),
-            "size": os.path.getsize}
+            "create_date": datetime.fromtimestamp(os.path.getctime(filename)).strftime('%d.%m.%Y %H:%M:%S'),
+            "edit_date": datetime.fromtimestamp(os.path.getmtime(filename)).strftime('%d.%m.%Y %H:%M:%S'),
+            "size": os.path.getsize(filename)}
 
 
 def create_file(filename: str, content: str = "") -> dict:
@@ -124,7 +121,6 @@ def create_file(filename: str, content: str = "") -> dict:
         ValueError: if filename is invalid.
     """
     if check_file_name(os.path.basename(filename)):
-        #logging.error("Filename is invalid")
         raise ValueError("Filename is invalid")
 
     with open(filename, "wb") as file:
@@ -145,11 +141,9 @@ def delete_file(filename: str) -> None:
     """
 
     if check_file_name(os.path.basename(filename)):
-        #logging.error("Filename is invalid")
         raise ValueError("Filename is invalid")
 
     if not os.path.exists(filename):
-        #logging.error("File does not exist")
         raise RuntimeError("File does not exist")
 
     try:
@@ -158,5 +152,4 @@ def delete_file(filename: str) -> None:
         else:
             os.removedirs(filename)
     except:
-        #logging.error("Can't delete file/path")
         raise RuntimeError("Can't delete file/path")
