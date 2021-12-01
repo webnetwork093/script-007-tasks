@@ -5,40 +5,12 @@ import logging
 import sys
 import traceback
 import configparser
-from Singleton import singleton
 import json
 
 from aiohttp import web
 
 from server.WebHandler import WebHandler
-
-@singleton
-class Config:
-    def __init__(self):
-
-        self.config = {}
-        self.read_config()
-        self.process_arguments()
-
-    def read_config(self) -> None:
-        self.config = configparser.ConfigParser()
-
-        with open(os.path.join(os.getcwd(), 'config.ini')) as stream:
-            self.config.read_string('[default]\n' + stream.read())
-
-        self.config = dict(self.config['default'])
-        return None
-
-    def process_arguments(self) -> None:
-        parser = argparse.ArgumentParser()
-        parser.add_argument('-d', '--dir', default=os.path.join(os.getcwd(), 'data'), type=str,
-                            help="Working directory, (default: 'data')")
-        parser.add_argument('-l', '--loglevel', default=self.config.get("log_level","error").lower(), choices=["debug", "info", "warning", "error"], type=str,
-                            help="Logging level, (default: 'error')")
-
-        self.config["args"] = parser.parse_args()
-
-        return None
+from server.Config import Config
 
 ##################################################################################################################
 
@@ -80,7 +52,7 @@ def main():
         web.post('/change_dir', handler.change_dir),
         web.get('/files', handler.get_files),
         web.get('/files/{filename}', handler.get_file_data),
-        web.post('/files/{filename}', handler.create_file),
+        web.post('/files', handler.create_file),
         web.delete('/files/{filename}', handler.delete_file),
     ])
 
